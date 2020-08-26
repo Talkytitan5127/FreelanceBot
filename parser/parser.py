@@ -1,8 +1,13 @@
 import requests
+import textwrap
 from bs4 import BeautifulSoup
 
 
 BASE_URL = 'https://freelance.habr.com/'
+
+
+def smile(hex):
+    return chr(int(hex, 16))
 
 
 class TaskListPage:
@@ -47,11 +52,11 @@ class ListItem:
 
         # договорная
         if negotiated_price is not None:
-            self.price = None
+            self.price = 0
             self.suffix = negotiated_price.string
         else:
             count_price = price_aside.find('span', class_='count')
-            self.price = count_price.text
+            self.price = str(count_price.next)
             self.suffix = count_price.span.string
 
         self.tags = [tag.text for tag in article.find('ul', class_='tags').select('li')]
@@ -64,3 +69,14 @@ class ListItem:
 
     def get_description(self):
         return 'very soon'
+
+    def markdown(self):
+        return textwrap.dedent('''
+        ## {header}
+        {smile_views} {count_views}
+        {smile_resps} {count_resps}
+        {smile_cash} {count_cash} - {suffix}
+        '''.format(header=self.header,
+                   smile_views=smile('0x0001F440'), count_views=self.count_views,
+                   smile_cash=smile('0x0001F4B0'), count_cash=self.price, suffix=self.suffix,
+                   smile_resps=smile('0x0001F4DD'), count_resps=self.count_responses))

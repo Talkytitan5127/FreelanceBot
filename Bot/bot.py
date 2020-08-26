@@ -1,6 +1,6 @@
 import logging
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 from telegram.ext import Updater, Dispatcher
 from telegram.ext import MessageHandler, CommandHandler
 from telegram.ext import CallbackContext, Filters
@@ -36,8 +36,8 @@ class FreelanceBot:
         for task in tasks:
             keyboard = [[InlineKeyboardButton("description", callback_data=task.get_description())]]
             reply_markup = InlineKeyboardMarkup(keyboard)
-            context.bot.send_message(update.effective_chat.id, text=str(task),
-                                     reply_markup=reply_markup)
+            context.bot.send_message(update.effective_chat.id, text=task.markdown(),
+                                     reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
 
     def __add_handler(self, dispatcher: Dispatcher):
         dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command), self.echo))
