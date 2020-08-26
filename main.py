@@ -1,12 +1,9 @@
 
-import requests
-from bs4 import BeautifulSoup
+from decouple import config
 
-import parser.parser as prs
+from Bot import FreelanceBot
 
 if __name__ == '__main__':
-    soup = None
-    with open('htmls/task_page_1.html', 'r') as f:
-        soup = BeautifulSoup(f.read())
-
-    print()
+    token = config('TOKEN')
+    bot = FreelanceBot(token)
+    bot.run()
