@@ -5,3 +5,6 @@ venv
 
 # pycharm
 .idea/
+
+# project
+htmls/
