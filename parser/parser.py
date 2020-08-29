@@ -32,10 +32,20 @@ class TaskIndexPage:
     def __init__(self, task_url):
         self.url = BASE_URL + task_url
 
+    def get_description(self):
+        resp = requests.get(self.url)
+        if resp.status_code != 200:
+            return 'Не получилось достать описание таски. Можете посмотреть его здесь: {}'.format(self.url)
+
+        soup = BeautifulSoup(resp.text)
+        task_description = soup.find('div', class_='task__description')
+        return task_description.text
+
 
 class ListItem:
     def __init__(self, article):
         # заголовок
+        self.description = None
         header_article = article.find('div', class_='task__title')
         self.header = header_article.get('title')
         # href на task
@@ -71,7 +81,12 @@ class ListItem:
         '''.format(theme=self.header, cost=self.price, suffix=self.suffix)
 
     def get_description(self):
-        return 'very soon'
+        if self.description is None:
+            self.description = TaskIndexPage(self.task_link).get_description()
+        return self.description
+
+    def get_task_page(self):
+        return BASE_URL + self.task_link
 
     def markdown(self):
         return textwrap.dedent('''

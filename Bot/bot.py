@@ -34,14 +34,14 @@ class FreelanceBot:
             logger.info('catch exception: ' + str(e))
             context.bot.send_message(update.effective_chat.id, text='smth goes wrong, sorry')
         for task in tasks:
-            keyboard = [[InlineKeyboardButton("description", callback_data=task.get_description(logger))]]
+            keyboard = [[InlineKeyboardButton("Открыть страницу таски", url=task.get_task_page())]]
             reply_markup = InlineKeyboardMarkup(keyboard)
             context.bot.send_message(update.effective_chat.id, text=task.markdown(),
                                      reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
 
     def process_callback_query(self, update: Update, context: CallbackContext):
         query = update.callback_query
-        context.bot.answer_callback_query(query.id, query.data, show_alert=True)
+        context.bot.answer_callback_query(query.id, query.data)
 
     def __add_handler(self, dispatcher: Dispatcher):
         dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command), self.echo))
