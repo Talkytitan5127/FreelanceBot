@@ -42,9 +42,12 @@ class ListItem:
         self.task_link = header_article.a.get('href')
 
         # отклик, просмотры, время публикации
-        self.published_at = article.find('span', class_='params__published-at').span.string
-        self.count_views = int(article.find('span', class_='params__views').i.string)
-        self.count_responses = int(article.find('span', class_='params__responses').i.string)
+        self.published_at = article.find('span', class_='params__published-at')
+        self.published_at = self.published_at.span.string if self.published_at else 'нет времени публикации'
+        self.count_views = article.find('span', class_='params__views')
+        self.count_views = int(self.count_views.i.string) if self.count_views else 0
+        self.count_responses = article.find('span', class_='params__responses')
+        self.count_responses = int(self.count_responses.i.string) if self.count_responses else 0
 
         # цена вопроса
         price_aside = article.find('div', class_='task__price')
