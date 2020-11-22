@@ -1,31 +1,13 @@
 import requests
 import textwrap
 from bs4 import BeautifulSoup
-
+from typing import List
 
 BASE_URL = 'https://freelance.habr.com/'
 
 
 def smile(hex):
     return chr(int(hex, 16))
-
-
-class TaskListPage:
-    def __init__(self):
-        self.url = BASE_URL + 'tasks'
-
-    def get_last_10_tasks(self):
-        resp = requests.get(self.url)
-        if resp.status_code != 200:
-            return []
-
-        result = []
-        soup = BeautifulSoup(resp.text)
-        articles = soup.find_all('article', limit=10)
-        for article in articles:
-            article = ListItem(article)
-            result.append(article)
-        return result
 
 
 class TaskIndexPage:
@@ -80,6 +62,16 @@ class ListItem:
         Деньги: {cost} ({suffix})
         '''.format(theme=self.header, cost=self.price, suffix=self.suffix)
 
+    def __eq__(self, other):
+        if self.header == other.header:
+            return True
+        return False
+
+    def __ne__(self, other):
+        if self.header != other.header:
+            return True
+        return False
+
     def get_description(self):
         if self.description is None:
             self.description = TaskIndexPage(self.task_link).get_description()
@@ -98,3 +90,22 @@ class ListItem:
                    smile_views=smile('0x0001F440'), count_views=self.count_views,
                    smile_cash=smile('0x0001F4B0'), count_cash=self.price, suffix=self.suffix,
                    smile_resps=smile('0x0001F4DD'), count_resps=self.count_responses))
+
+
+# на 0-ой позиции -> самая верхняя таска (самая новая)
+class TaskListPage:
+    def __init__(self):
+        self.url = BASE_URL + 'tasks'
+
+    def get_last_10_tasks(self) -> List[ListItem]:
+        resp = requests.get(self.url)
+        if resp.status_code != 200:
+            return []
+
+        result = []
+        soup = BeautifulSoup(resp.text)
+        articles = soup.find_all('article', limit=10)
+        for article in articles:
+            article = ListItem(article)
+            result.append(article)
+        return result
